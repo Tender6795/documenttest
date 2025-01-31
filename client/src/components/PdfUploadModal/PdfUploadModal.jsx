@@ -1,9 +1,30 @@
-import React, { useState } from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  Typography,
+} from "@mui/material";
 import { useDropzone } from "react-dropzone";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.6.347/build/pdf.worker.min.js`;
 
 const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFile }) => {
   const [error, setError] = useState("");
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+
+  useEffect(() => {
+    if (!open) {
+      setPdfUrl(null);
+      setSelectedFile(null);
+      setPageNumber(1);
+    }
+  }, [open, setSelectedFile]);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".pdf",
@@ -11,9 +32,12 @@ const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFil
       if (acceptedFiles[0]?.type !== "application/pdf") {
         setError("Please select a valid PDF file.");
         setSelectedFile(null);
+        setPdfUrl(null);
       } else {
         setError("");
         setSelectedFile(acceptedFiles[0]);
+        const fileUrl = URL.createObjectURL(acceptedFiles[0]);
+        setPdfUrl(fileUrl);
       }
     },
   });
@@ -22,6 +46,7 @@ const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFil
     console.log("Submitted file:", selectedFile);
     handleClose();
   };
+
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
@@ -36,13 +61,40 @@ const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFil
             textAlign: "center",
             cursor: "pointer",
             height: "400px",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
           <input {...getInputProps()} />
           {selectedFile ? (
-            <Typography variant="body1" color="textPrimary">
-              {selectedFile.name}
-            </Typography>
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "100%",
+                height: "100%",
+                overflow: "auto",
+              }}
+            >
+              {pdfUrl ? (
+                <Document
+                  file={pdfUrl}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    maxHeight: "100%",
+                  }}
+                >
+                  <Page pageNumber={pageNumber} />
+                </Document>
+              ) : (
+                <Typography variant="body1" color="error">
+                  Failed to load PDF URL.
+                </Typography>
+              )}
+            </div>
           ) : (
             <Typography variant="body1" color="textSecondary">
               Drag and drop a PDF file here or click to select
@@ -51,7 +103,11 @@ const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFil
         </div>
 
         {error && (
-          <Typography variant="body2" color="error" style={{ marginTop: "10px" }}>
+          <Typography
+            variant="body2"
+            color="error"
+            style={{ marginTop: "10px" }}
+          >
             {error}
           </Typography>
         )}

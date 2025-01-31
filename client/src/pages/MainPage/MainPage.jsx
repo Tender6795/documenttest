@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, Paper } from "@mui/material";
+import { Grid } from "@mui/material";
 import DocumentPreview from "../../components/DocumentPrview/DocumentPrview";
 import PdfUploadModal from "../../components/PdfUploadModal/PdfUploadModal";
 
