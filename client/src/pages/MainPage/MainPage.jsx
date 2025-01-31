@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import DocumentPreview from "../../components/DocumentPrview/DocumentPrview";
 import PdfUploadModal from "../../components/PdfUploadModal/PdfUploadModal";
 
@@ -27,23 +27,30 @@ const MainPage = () => {
 
   return (
     <div>
-      <Grid container spacing={2} p={6}>
+      <Box
+        display="flex"
+        flexWrap="wrap"
+        justifyContent="flex-start"
+        p={6}
+      >
         {testDocuments.map((doc) => (
-          <Grid
-            item
-            xs={12}
-            sm={4}
-            lg={2}
+          <Box
             key={doc.id}
             onClick={() => handleClickOpen(doc.id)}
+            sx={{
+              minWidth: "200px",
+              cursor: "pointer",
+              marginRight: "16px",
+              marginBottom: "16px",
+            }}
           >
             <DocumentPreview
               fileName={doc.fileName}
               uploadDate={doc.uploadDate}
             />
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       <PdfUploadModal
         open={openModal}
