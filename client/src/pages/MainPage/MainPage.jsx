@@ -3,16 +3,18 @@ import { Box } from "@mui/material";
 import DocumentPreview from "../../components/DocumentPrview/DocumentPrview";
 import PdfUploadModal from "../../components/PdfUploadModal/PdfUploadModal";
 
-const testDocuments = Array.from({ length: 9 }, (_, i) => ({
-  id: i + 1,
-  fileName: `Document ${i + 1}.pdf`,
-  uploadDate: `2025-01-${10 + i}`,
-}));
-
 const MainPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [testDocuments, setTestDocuments] = useState(
+    Array.from({ length: 9 }, (_, i) => ({
+      id: i + 1,
+      fileName: "",
+      uploadDate: "",
+      file: null,
+    }))
+  );
 
   const handleClickOpen = (id) => {
     setSelectedIndex(id);
@@ -25,14 +27,21 @@ const MainPage = () => {
     setSelectedIndex(null);
   };
 
+  const handleFileUpload = (file) => {
+    const updatedDocs = [...testDocuments];
+    updatedDocs[selectedIndex - 1] = {
+      ...updatedDocs[selectedIndex - 1],
+      fileName: file.name,
+      uploadDate: new Date().toISOString().split("T")[0],
+      file: file,
+    };
+    setTestDocuments(updatedDocs);
+    setOpenModal(false);
+  };
+
   return (
     <div>
-      <Box
-        display="flex"
-        flexWrap="wrap"
-        justifyContent="flex-start"
-        p={6}
-      >
+      <Box display="flex" flexWrap="wrap" justifyContent="flex-start" p={6}>
         {testDocuments.map((doc) => (
           <Box
             key={doc.id}
@@ -58,6 +67,7 @@ const MainPage = () => {
         index={selectedIndex}
         selectedFile={selectedFile}
         setSelectedFile={setSelectedFile}
+        handleFileUpload={handleFileUpload}
       />
     </div>
   );

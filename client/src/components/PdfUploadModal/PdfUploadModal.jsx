@@ -13,9 +13,17 @@ import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.6.347/build/pdf.worker.min.js`;
 
-const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFile }) => {
+const PdfUploadModal = ({
+  open,
+  handleClose,
+  index,
+  selectedFile,
+  setSelectedFile,
+  handleFileUpload,
+}) => {
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
   useEffect(() => {
@@ -23,6 +31,7 @@ const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFil
       setPdfUrl(null);
       setSelectedFile(null);
       setPageNumber(1);
+      setNumPages(null);
     }
   }, [open, setSelectedFile]);
 
@@ -43,10 +52,25 @@ const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFil
   });
 
   const handleSubmit = () => {
-    console.log("Submitted file:", selectedFile);
-    handleClose();
+    if (selectedFile) {
+      handleFileUpload(selectedFile);
+    }
   };
 
+  const onLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+  };
+
+  useEffect(() => {
+    if (!selectedFile) {
+      console.log("No file selected.");
+    } else {
+      console.log("Selected file:", selectedFile);
+      const fileUrl = URL.createObjectURL(selectedFile);
+      console.log("Generated file URL:", fileUrl);
+      setPdfUrl(fileUrl);
+    }
+  }, [selectedFile]);
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
@@ -81,6 +105,7 @@ const PdfUploadModal = ({ open, handleClose, index, selectedFile, setSelectedFil
               {pdfUrl ? (
                 <Document
                   file={pdfUrl}
+                  onLoadSuccess={onLoadSuccess}
                   style={{
                     width: "100%",
                     height: "auto",
