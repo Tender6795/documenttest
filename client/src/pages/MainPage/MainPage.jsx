@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import DocumentPreview from "../../components/DocumentPrview/DocumentPrview";
 import PdfUploadModal from "../../components/PdfUploadModal/PdfUploadModal";
 import Header from "../../components/Header/Header";
+import { uploadFile } from "../../services/fileService";
 
 const MainPage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -20,7 +21,7 @@ const MainPage = () => {
   const handleClickOpen = (id) => {
     const doc = testDocuments.find((document) => document.id === id);
     setSelectedIndex(id);
-    setSelectedFile(doc?.file || null); 
+    setSelectedFile(doc?.file || null);
     setOpenModal(true);
   };
 
@@ -30,21 +31,31 @@ const MainPage = () => {
     setSelectedIndex(null);
   };
 
-  const handleFileUpload = (file) => {
-    const updatedDocs = [...testDocuments];
-    updatedDocs[selectedIndex - 1] = {
-      ...updatedDocs[selectedIndex - 1],
-      fileName: file.name,
-      uploadDate: new Date().toISOString().split("T")[0],
-      file: file,
-    };
-    setTestDocuments(updatedDocs);
-    setOpenModal(false);
+  const handleFileUpload = async (file) => {
+    try {
+      const response = await uploadFile(
+        file,
+      );
+      const updatedDocs = [...testDocuments];
+      updatedDocs[selectedIndex - 1] = {
+        ...updatedDocs[selectedIndex - 1],
+        fileName: response.name,
+        uploadDate: response.createdAt,
+        file: file,
+      };
+      setTestDocuments(updatedDocs);
+      setOpenModal(false);
+      setSelectedFile(null);
+      setSelectedIndex(null);
+      console.log(response);
+    } catch (error) {
+      console.error("Error during file upload:", error);
+    }
   };
 
   return (
     <div>
-        <Header/>
+      <Header />
       <Box display="flex" flexWrap="wrap" justifyContent="flex-start" p={6}>
         {testDocuments.map((doc) => (
           <Box
