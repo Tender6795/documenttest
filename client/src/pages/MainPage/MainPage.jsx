@@ -17,7 +17,9 @@ const MainPage = () => {
   );
 
   const handleClickOpen = (id) => {
+    const doc = testDocuments.find((document) => document.id === id);
     setSelectedIndex(id);
+    setSelectedFile(doc?.file || null); // Передаем файл в модальное окно
     setOpenModal(true);
   };
 

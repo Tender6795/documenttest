@@ -35,6 +35,13 @@ const PdfUploadModal = ({
     }
   }, [open, setSelectedFile]);
 
+  useEffect(() => {
+    if (selectedFile) {
+      const fileUrl = URL.createObjectURL(selectedFile);
+      setPdfUrl(fileUrl);
+    }
+  }, [selectedFile]);
+
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".pdf",
     onDrop: (acceptedFiles) => {
@@ -57,82 +64,64 @@ const PdfUploadModal = ({
     }
   };
 
-  const onLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-  };
-
-  useEffect(() => {
-    if (!selectedFile) {
-      console.log("No file selected.");
-    } else {
-      console.log("Selected file:", selectedFile);
-      const fileUrl = URL.createObjectURL(selectedFile);
-      console.log("Generated file URL:", fileUrl);
-      setPdfUrl(fileUrl);
-    }
-  }, [selectedFile]);
-
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-      <DialogTitle>Upload PDF file for Document {index}</DialogTitle>
-      <DialogContent>
-        <div
-          {...getRootProps()}
-          style={{
-            border: "2px dashed #1976d2",
-            borderRadius: "8px",
-            padding: "40px",
-            textAlign: "center",
-            cursor: "pointer",
-            height: "400px",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <input {...getInputProps()} />
-          {selectedFile ? (
-            <div
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="md"
+      sx={{
+        "& .MuiDialog-paper": {
+          width: "80%",
+          maxHeight: "80vh",
+          borderRadius: "12px", 
+        },
+      }}
+    >
+      <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>
+        Upload PDF file for Document {index}
+      </DialogTitle>
+      <DialogContent sx={{ overflow: "auto", height: "80vh" }}>
+        {selectedFile ? (
+          <div style={{ textAlign: "center" }}>
+            <Document
+              file={pdfUrl}
+              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
               style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "100%",
-                height: "100%",
-                overflow: "auto",
+                width: "80%",
+                height: "auto",
+                maxHeight: "500px",
               }}
             >
-              {pdfUrl ? (
-                <Document
-                  file={pdfUrl}
-                  onLoadSuccess={onLoadSuccess}
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: "100%",
-                  }}
-                >
-                  <Page pageNumber={pageNumber} />
-                </Document>
-              ) : (
-                <Typography variant="body1" color="error">
-                  Failed to load PDF URL.
-                </Typography>
-              )}
-            </div>
-          ) : (
+              <Page pageNumber={pageNumber} />
+            </Document>
+            <Typography variant="h6" style={{ marginTop: "10px" }}>
+              Page {pageNumber} of {numPages}
+            </Typography>
+          </div>
+        ) : (
+          <div
+            {...getRootProps()}
+            style={{
+              border: "2px dashed #1976d2",
+              borderRadius: "8px",
+              padding: "40px",
+              textAlign: "center",
+              cursor: "pointer",
+              height: "80%", 
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <input {...getInputProps()} />
             <Typography variant="body1" color="textSecondary">
               Drag and drop a PDF file here or click to select
             </Typography>
-          )}
-        </div>
+          </div>
+        )}
 
         {error && (
-          <Typography
-            variant="body2"
-            color="error"
-            style={{ marginTop: "10px" }}
-          >
+          <Typography variant="body2" color="error" style={{ marginTop: "10px" }}>
             {error}
           </Typography>
         )}
@@ -141,14 +130,10 @@ const PdfUploadModal = ({
         <Button
           onClick={handleClose}
           color="primary"
-          style={{
+          sx={{
             backgroundColor: "#f44336",
             color: "#fff",
             fontWeight: "bold",
-            padding: "8px 16px",
-            borderRadius: "4px",
-            textTransform: "none",
-            marginRight: "10px",
           }}
         >
           Cancel
@@ -157,14 +142,10 @@ const PdfUploadModal = ({
           onClick={handleSubmit}
           color="primary"
           disabled={!selectedFile}
-          style={{
+          sx={{
             backgroundColor: "#1976d2",
             color: "#fff",
             fontWeight: "bold",
-            padding: "8px 16px",
-            borderRadius: "4px",
-            textTransform: "none",
-            marginLeft: "10px",
           }}
         >
           Submit
