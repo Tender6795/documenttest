@@ -3,7 +3,7 @@ import { Card, CardContent, Typography } from "@mui/material";
 
 const DocumentPreview = ({ fileName = "", uploadDate = "" }) => {
   return (
-    <Card sx={{ width: 300, height: 400, boxShadow: 3, borderRadius: 2 }}>
+    <Card sx={{ width: 270, height: 350, boxShadow: 3, borderRadius: 2 }}>
       <div style={{ backgroundColor: "#1976d2", color: "white", padding: "10px", borderTopLeftRadius: "8px", borderTopRightRadius: "8px" }}>
         <Typography variant="h6" component="div" fontWeight="bold">
           File Details
