@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box } from "@mui/material";
 import DocumentPreview from "../../components/DocumentPrview/DocumentPrview";
 import PdfUploadModal from "../../components/PdfUploadModal/PdfUploadModal";
+import Header from "../../components/Header/Header";
 
 const MainPage = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -19,7 +20,7 @@ const MainPage = () => {
   const handleClickOpen = (id) => {
     const doc = testDocuments.find((document) => document.id === id);
     setSelectedIndex(id);
-    setSelectedFile(doc?.file || null); // Передаем файл в модальное окно
+    setSelectedFile(doc?.file || null); 
     setOpenModal(true);
   };
 
@@ -43,6 +44,7 @@ const MainPage = () => {
 
   return (
     <div>
+        <Header/>
       <Box display="flex" flexWrap="wrap" justifyContent="flex-start" p={6}>
         {testDocuments.map((doc) => (
           <Box
@@ -58,6 +60,7 @@ const MainPage = () => {
             <DocumentPreview
               fileName={doc.fileName}
               uploadDate={doc.uploadDate}
+              number={doc.id}
             />
           </Box>
         ))}
